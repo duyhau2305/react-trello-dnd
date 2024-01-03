@@ -4,18 +4,7 @@ import { Card, Tooltip, Button, Popconfirm } from "antd";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import SimpleCard from "./SimpleCard";
 
-function TrelloList({ title, listId, index, cards, setOpen, onDeleteList }) {
-  const [listCards, setListCards] = useState(cards);
-
-  const handleDeleteList = () => {
-    onDeleteList(listId);
-  };
-
-  const handleRemoveCard = (cardId) => {
-    const updatedCards = listCards.filter(card => card.id !== cardId);
-    setListCards(updatedCards);
-  };
-
+function TrelloList({ title, listId, index, cards, setOpen, onDeleteList, onRemoveCard }) {
   return (
     <Draggable draggableId={String(listId)} index={index}>
       {(provided) => (
@@ -42,7 +31,7 @@ function TrelloList({ title, listId, index, cards, setOpen, onDeleteList }) {
     
                     <Popconfirm
                       title="Are you sure to delete this list?"
-                      onConfirm={handleDeleteList}
+                      onConfirm={() => onDeleteList(listId)}
                       okText="Yes"
                       cancelText="No"
                       showCancel={false}
@@ -60,14 +49,15 @@ function TrelloList({ title, listId, index, cards, setOpen, onDeleteList }) {
                 <div
                   ref={provided.innerRef}
                   {...provided.droppableProps}
+                  className="todoList__content"
                 >
-                  {listCards.map((card, cardIndex) => (
+                  {cards.map((card, cardIndex) => (
                     <SimpleCard 
                       key={card.id}
                       index={cardIndex}
                       card={card}
                       listId={listId}
-                      onRemoveCard={handleRemoveCard}
+                      onRemoveCard={onRemoveCard}
                     />
                   ))}
                   {provided.placeholder}

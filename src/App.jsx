@@ -80,13 +80,15 @@ function App() {
       const cards = [...todos.lists[source.droppableId].cards];
       const cardSpliced = cards.splice(source.index, 1)[0];
       cards.splice(destination.index, 0, cardSpliced);
+
+      console.log('cards: ', cards)
       setTodos(prevState => {
         return {
           ...prevState,
           lists: {
             ...prevState.lists,
-            [source.droppableId]: {
-              ...prevState.lists[source.droppableId],
+            [destination.droppableId]: {
+              ...prevState.lists[destination.droppableId],
               cards
             }
           }
@@ -96,34 +98,32 @@ function App() {
     }
 
     // different list
-    if (source.droppableId !== destination.droppableId) {
-      const start = todos.lists[source.droppableId];
-      const finish = todos.lists[destination.droppableId];
-  
-      // clone  list cũ và xóa list khỏi danh sach
-      const newStartCards = [...start.cards];
-      const [movedCard] = newStartCards.splice(source.index, 1);
-  
-      // Clone list mới và thêm list vào danh sách
-      const newFinishCards = [...finish.cards];
-      newFinishCards.splice(destination.index, 0, movedCard);
-  
-      // Clone lại list cũ và mới để update state
-      const newStart = { ...start, cards: newStartCards };
-      const newFinish = { ...finish, cards: newFinishCards };
-  
-      // Update the state with the new lists
-      const newState = {
-        ...todos,
-        lists: {
-          ...todos.lists,
-          [newStart.id]: newStart,
-          [newFinish.id]: newFinish,
-        },
-      };
-  
-      setTodos(newState);
-    }
+    const start = todos.lists[source.droppableId];
+    const finish = todos.lists[destination.droppableId];
+
+    // clone  list cũ và xóa list khỏi danh sach
+    const newStartCards = [...start.cards];
+    const [movedCard] = newStartCards.splice(source.index, 1);
+
+    // Clone list mới và thêm list vào danh sách
+    const newFinishCards = [...finish.cards];
+    newFinishCards.splice(destination.index, 0, movedCard);
+
+    // Clone lại list cũ và mới để update state
+    const newStart = { ...start, cards: newStartCards };
+    const newFinish = { ...finish, cards: newFinishCards };
+
+    // Update the state with the new lists
+    const newState = {
+      ...todos,
+      lists: {
+        ...todos.lists,
+        [newStart.id]: newStart,
+        [newFinish.id]: newFinish,
+      },
+    };
+
+    setTodos(newState);
   }
 
   function handleAddList() {
@@ -144,11 +144,11 @@ function App() {
     })
   }
   // delete
-  const handleDeleteList = (listIdToDelete) => {
+  const onDeleteList = (listId) => {
     setTodos(prevState => {
       const updatedLists = { ...prevState.lists };
-      delete updatedLists[listIdToDelete];
-      const updatedColumns = prevState.columns.filter(id => id !== listIdToDelete);
+      delete updatedLists[listId];
+      const updatedColumns = prevState.columns.filter(id => id !== listId);
 
       return {
         ...prevState,
@@ -159,28 +159,29 @@ function App() {
   };
   console.log('todos: ', todos)
   const onRemoveCard = (listId, cardId) => {
-    setTodos(prevState => {
-      // Cập nhật danh sách card trong list tương ứng
-      const updatedCardsList = prevState.lists[listId].cards.filter(id => id !== cardId);
+    console.log('onRemoveCard: ', { listId, cardId })
+    // setTodos(prevState => {
+    //   // Cập nhật danh sách card trong list tương ứng
+    //   const updatedCardsList = prevState.lists[listId].cards.filter(id => id !== cardId);
   
-      // Cập nhật danh sách tổng thể của cards, nếu cần
-      const updatedCards = { ...prevState.cards };
-      delete updatedCards[cardId];
+    //   // Cập nhật danh sách tổng thể của cards, nếu cần
+    //   const updatedCards = { ...prevState.cards };
+    //   delete updatedCards[cardId];
   
-      return {
-        ...prevState,
-        lists: {
-          ...prevState.lists,
-          [listId]: {
-            ...prevState.lists[listId],
-            cards: updatedCardsList
-          }
-        },
-        cards: updatedCards
-      };
-    });
+    //   return {
+    //     ...prevState,
+    //     lists: {
+    //       ...prevState.lists,
+    //       [listId]: {
+    //         ...prevState.lists[listId],
+    //         cards: updatedCardsList
+    //       }
+    //     },
+    //     cards: updatedCards
+    //   };
+    // });
   };
-  
+
 
   return (
     <>
@@ -219,7 +220,7 @@ function App() {
                       listId={listItem.id}
                       cards={cards}
                       setOpen={setOpen}
-                      onDeleteList={handleDeleteList}
+                      onDeleteList={onDeleteList}
                       onRemoveCard={onRemoveCard}
                      
                     />

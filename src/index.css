@@ -174,3 +174,7 @@ main {
   flex-direction: column;
   word-break: break-all;
 }
+
+.todoList__content {
+  min-height: 10px;
+}
