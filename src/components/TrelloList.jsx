@@ -1,25 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
-
-// ant core
-import {
-  Card,
-  Tooltip,
-  Button,
-  Popconfirm,
-} from "antd";
-
-// ant icons
+import { Card, Tooltip, Button, Popconfirm } from "antd";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
-
-// components
 import SimpleCard from "./SimpleCard";
 
+function TrelloList({ title, listId, index, cards, setOpen, onDeleteList }) {
+  const [listCards, setListCards] = useState(cards);
 
-function TrelloList({ title, listId, index, cards, setOpen }) {
+  const handleDeleteList = () => {
+    onDeleteList(listId);
+  };
+
+  const handleRemoveCard = (cardId) => {
+    const updatedCards = listCards.filter(card => card.id !== cardId);
+    setListCards(updatedCards);
+  };
+
   return (
-    <Draggable  draggableId={String(listId)} index={index}>
-      {(provided, snapshot) => (
+    <Draggable draggableId={String(listId)} index={index}>
+      {(provided) => (
         <div
           ref={provided.innerRef}
           {...provided.draggableProps}
@@ -27,7 +26,7 @@ function TrelloList({ title, listId, index, cards, setOpen }) {
           className='todoList'
         >
           <Droppable droppableId={String(listId)} type="CARD">
-            {(provided, snapshot) => (
+            {(provided) => (
               <Card
                 title={title}
                 className="cardList"
@@ -42,13 +41,11 @@ function TrelloList({ title, listId, index, cards, setOpen }) {
                     </Tooltip>
     
                     <Popconfirm
-                      title="Delete the list"
-                      description="Are you sure to delete this list?"
-                      onConfirm={() => {}}
-                      showCancel={false}
+                      title="Are you sure to delete this list?"
+                      onConfirm={handleDeleteList}
                       okText="Yes"
                       cancelText="No"
-                      className="ml-10"
+                      showCancel={false}
                     >
                       <Tooltip title="Delete this list">
                         <Button
@@ -62,32 +59,26 @@ function TrelloList({ title, listId, index, cards, setOpen }) {
               >
                 <div
                   ref={provided.innerRef}
-                  // style={{ backgroundColor: snapshot.isDraggingOver ? 'blue' : 'grey' }}
                   {...provided.droppableProps}
                 >
-                  {cards.map((card, cardIndex) => {
-                    return (
-                      <SimpleCard 
-                        key={card.id}
-                        index={cardIndex}
-                        card={card}
-                      />
-                    )
-                  })}
+                  {listCards.map((card, cardIndex) => (
+                    <SimpleCard 
+                      key={card.id}
+                      index={cardIndex}
+                      card={card}
+                      listId={listId}
+                      onRemoveCard={handleRemoveCard}
+                    />
+                  ))}
                   {provided.placeholder}
                 </div>
-                
               </Card>
-             
             )}
           </Droppable>
-          
         </div>
       )}
-      
     </Draggable>
-    
   )
 }
 
-export default TrelloList
+export default TrelloList;

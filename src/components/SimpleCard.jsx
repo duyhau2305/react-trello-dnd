@@ -1,23 +1,15 @@
 import React from "react";
-import {
-  Card,
-  Avatar,
-  Tooltip,
-  Popconfirm,
-} from "antd";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  AntDesignOutlined,
-  UserOutlined,
-  FileTextOutlined,
-} from "@ant-design/icons";
+import { Card, Tooltip, Popconfirm } from "antd";
+import { EditOutlined, DeleteOutlined, FileTextOutlined } from "@ant-design/icons";
+import { Draggable } from "react-beautiful-dnd";
 
 const { Meta } = Card;
 
-import { Draggable } from 'react-beautiful-dnd';
+function SimpleCard({ card, index, listId, onRemoveCard }) {
+  const handleRemoveCard = () => {
+    onRemoveCard(listId, card.id);
+  };
 
-function SimpleCard({ card, index}) {
   return (
     <Draggable draggableId={card.id} index={index}>
       {(provided, snapshot) => (
@@ -40,7 +32,7 @@ function SimpleCard({ card, index}) {
               <Popconfirm
                 title="Delete the card"
                 description="Are you sure to delete this card?"
-                onConfirm={() => {}}
+                onConfirm={handleRemoveCard}
                 showCancel={false}
                 okText="Yes"
                 cancelText="No"
@@ -64,7 +56,6 @@ function SimpleCard({ card, index}) {
         </div>
       )}
     </Draggable>
-    
   );
 }
 
