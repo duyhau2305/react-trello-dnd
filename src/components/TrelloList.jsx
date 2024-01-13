@@ -1,17 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
-import { Card, Tooltip, Button, Popconfirm } from "antd";
+import { Card, Tooltip, Button, Popconfirm, Space } from "antd";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import SimpleCard from "./SimpleCard";
 
-function TrelloList({ title, listId, index, cards, setOpen, onDeleteList, onRemoveCard,handleAddCard }) {
+function TrelloList({ title, listId, index, cards, setModalType, onDeleteList, onRemoveCard, setCurrentListId, openEditCard }) {
   const onAddCard = () => {
-    handleAddCard(listId,cards.id)
-    setOpen(true)
+    setCurrentListId(listId)
+    setModalType('add')
   };
-
-  
-
 
   return (
     <Draggable draggableId={String(listId)} index={index}>
@@ -28,13 +25,12 @@ function TrelloList({ title, listId, index, cards, setOpen, onDeleteList, onRemo
                 title={title}
                 className="cardList"
                 extra={
-                  <>
+                  <Space>
                     <Tooltip title="Add a card">
                       <Button
                         shape="circle"
                         icon={<PlusOutlined />}
-                        onClick={() => setOpen(true)}
-                        onConfirm={onAddCard }
+                        onClick={onAddCard}
                       />
                     </Tooltip>
     
@@ -52,7 +48,7 @@ function TrelloList({ title, listId, index, cards, setOpen, onDeleteList, onRemo
                         />
                       </Tooltip>
                     </Popconfirm>
-                  </>
+                  </Space>
                 }
               >
                 <div
@@ -67,7 +63,7 @@ function TrelloList({ title, listId, index, cards, setOpen, onDeleteList, onRemo
                       card={card}
                       listId={listId}
                       onRemoveCard={onRemoveCard}
-                      
+                      openEditCard={openEditCard}
                     />
                   ))}
                   {provided.placeholder}

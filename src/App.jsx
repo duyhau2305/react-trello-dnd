@@ -1,9 +1,8 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 
 // ant core
 import {
-  Avatar,
   Button,
   Modal,
   Input,
@@ -12,7 +11,7 @@ import {
 } from "antd";
 
 // ant icons
-import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 
 // components
 import TrelloList from "./components/TrelloList";
@@ -21,7 +20,6 @@ import TrelloList from "./components/TrelloList";
 import { data } from "./data";
 
 const { TextArea } = Input;
-const { Option } = Select;
 
 const options = [];
 for (let i = 10; i < 36; i++) {
@@ -33,20 +31,50 @@ for (let i = 10; i < 36; i++) {
 
 function App() {
   const [form] = Form.useForm();
-  const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [todos, setTodos] = useState(data);
+  const [modalType, setModalType] = useState(null);
   const [currentListId, setCurrentListId] = useState(null);
 
   const handleSubmit = (values) => {
-    console.log("values: ", values);
-    handleAddCard(currentListId, values);
     setConfirmLoading(true);
-    setOpen(false);
+
+    setTodos(prevState => {
+      // Create a new card object with a unique ID and details passed from cardDetails
+      const newCard = {
+        id: `card-${Date.now()}`,
+        ...values
+      };
+  
+      // Get the current list and add the new card ID to it
+      const updatedList = {
+        ...prevState.lists[currentListId],
+        cards: [...prevState.lists[currentListId].cards, newCard.id]
+      };
+  
+      // Update the state with the new list and card
+      return {
+        ...prevState,
+        lists: {
+          ...prevState.lists,
+          [currentListId]: updatedList // push cardId into cards array
+        },
+        cards: {
+          ...prevState.cards,
+          [newCard.id]: newCard // Assuming you maintain a separate cards collection
+        }
+      };
+    });
+
+    setTimeout(() => {
+      setConfirmLoading(false);
+      setModalType(null);
+      form.resetFields();
+    }, 500)
   };
 
   const handleCancel = () => {
-    setOpen(false);
+    setModalType(null);
   };
 
   const handleChange = (value) => {
@@ -179,35 +207,12 @@ function App() {
       };
     });
   };
-  const handleAddCard = (listId, cardDetails) => {
-    setTodos(prevState => {
-      // Create a new card object with a unique ID and details passed from cardDetails
-      const newCard = {
-        id: `card-${Date.now()}`,
-        ...cardDetails
-      };
-  
-      // Get the current list and add the new card ID to it
-      const updatedList = {
-        ...prevState.lists[listId],
-        cards: [...prevState.lists[listId].cards, newCard.id]
-      };
-  
-      // Update the state with the new list and card
-      return {
-        ...prevState,
-        lists: {
-          ...prevState.lists,
-          [listId]: updatedList
-        },
-        cards: {
-          ...prevState.cards,
-          [newCard.id]: newCard // Assuming you maintain a separate cards collection
-        }
-      };
-    });
-  };
-  
+
+  const openEditCard = (card) => {
+    setModalType("edit");
+
+    console.log('card: ', card)
+  }
 
   return (
     <>
@@ -245,11 +250,11 @@ function App() {
                       title={listItem.title}
                       listId={listItem.id}
                       cards={cards}
-                      setOpen={setOpen}
+                      setModalType={setModalType}
+                      setCurrentListId={setCurrentListId}
                       onDeleteList={onDeleteList}
                       onRemoveCard={onRemoveCard}
-                      handleAddCard={handleAddCard}
-                     
+                      openEditCard={openEditCard}
                     />
                   )
                 })}
@@ -267,8 +272,8 @@ function App() {
       </main>
 
       <Modal
-        title="Add Card"
-        open={open}
+        title={modalType === "add" ? "Add new card" : "Edit card"}
+        open={Boolean(modalType)}
         onOk={form.submit}
         onCancel={handleCancel}
         confirmLoading={confirmLoading}
@@ -302,36 +307,6 @@ function App() {
             <TextArea rows={4} />
           </Form.Item>
 
-          <Form.Item
-            label="Member"
-            name="member"
-            rules={[
-              { required: true, message: "Please input your description!" },
-            ]}
-          >
-            <Select
-              mode="multiple"
-              allowClear
-              style={{ width: "100%" }}
-              placeholder="Please select"
-              optionLabelProp="label"
-              onChange={handleChange}
-            >
-              <Option value="tony123" label="tony 123">
-                <div className="selectField">
-                  <Avatar src="https://picsum.photos/id/237/200/300" />
-                  <span>Tony Nguyen</span>
-                </div>
-              </Option>
-              <Option value="phuong123" label="phuong 123">
-                <div className="selectField">
-                  <Avatar src="https://picsum.photos/id/237/200/300" />
-                  <span>Phuong Nguyen</span>
-                </div>
-              </Option>
-            </Select>
-          </Form.Item>
-
           <Form.Item label="Status" name="status">
             <Select
               style={{ width: 120 }}
@@ -353,6 +328,18 @@ function App() {
             />
           </Form.Item>
         </Form>
+      </Modal>
+
+      <Modal
+        title="Learn javascript"
+        // open
+        // open={open}
+        // onOk={form.submit}
+        // onCancel={handleCancel}
+      >
+        <br />
+        <h3>Description</h3>
+        <div>todo 1</div>
       </Modal>
     </>
   );

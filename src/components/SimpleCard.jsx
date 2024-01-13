@@ -5,7 +5,7 @@ import { Draggable } from "react-beautiful-dnd";
 
 const { Meta } = Card;
 
-function SimpleCard({ card, index, listId, onRemoveCard, }) {
+function SimpleCard({ card, index, listId, onRemoveCard, openEditCard }) {
   const handleRemoveCard = () => {
     onRemoveCard(listId, card.id);
   };
@@ -27,7 +27,7 @@ function SimpleCard({ card, index, listId, onRemoveCard, }) {
                 <FileTextOutlined key="view" />
               </Tooltip>,
               <Tooltip title="Edit">
-                <EditOutlined key="edit" />
+                <EditOutlined key="edit" onClick={() => openEditCard(card)}/>
               </Tooltip>,
               <Popconfirm
                 title="Delete the card"
