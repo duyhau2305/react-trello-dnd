@@ -39,32 +39,49 @@ function App() {
   const handleSubmit = (values) => {
     setConfirmLoading(true);
 
-    setTodos(prevState => {
-      // Create a new card object with a unique ID and details passed from cardDetails
-      const newCard = {
-        id: `card-${Date.now()}`,
-        ...values
-      };
-  
-      // Get the current list and add the new card ID to it
-      const updatedList = {
-        ...prevState.lists[currentListId],
-        cards: [...prevState.lists[currentListId].cards, newCard.id]
-      };
-  
-      // Update the state with the new list and card
-      return {
+    if(modalType === "add") {
+      setTodos(prevState => {
+        // Create a new card object with a unique ID and details passed from cardDetails
+        const newCard = {
+          id: `card-${Date.now()}`,
+          ...values
+        };
+    
+        // Get the current list and add the new card ID to it
+        const updatedList = {
+          ...prevState.lists[currentListId],
+          cards: [...prevState.lists[currentListId].cards, newCard.id]
+        };
+    
+        // Update the state with the new list and card
+        return {
+          ...prevState,
+          lists: {
+            ...prevState.lists,
+            [currentListId]: updatedList // push cardId into cards array
+          },
+          cards: {
+            ...prevState.cards,
+            [newCard.id]: newCard // Assuming you maintain a separate cards collection
+          }
+        };
+      });
+    }
+    
+    if(modalType === "edit") {
+      const cardId = form.getFieldValue("id");
+      setTodos(prevState => ({
         ...prevState,
-        lists: {
-          ...prevState.lists,
-          [currentListId]: updatedList // push cardId into cards array
-        },
         cards: {
           ...prevState.cards,
-          [newCard.id]: newCard // Assuming you maintain a separate cards collection
+          [cardId]: {
+            ...prevState.cards[cardId],
+            ...values
+          }
         }
-      };
-    });
+      }))
+    }
+    
 
     setTimeout(() => {
       setConfirmLoading(false);
@@ -74,6 +91,7 @@ function App() {
   };
 
   const handleCancel = () => {
+    form.resetFields();
     setModalType(null);
   };
 
@@ -210,8 +228,12 @@ function App() {
 
   const openEditCard = (card) => {
     setModalType("edit");
-
-    console.log('card: ', card)
+    form.setFieldsValue({
+      id: card.id,
+      title: card.title,
+      description: card.description,
+      status: card.status,
+    })
   }
 
   return (
@@ -282,7 +304,6 @@ function App() {
         <Form
           name="basic"
           form={form}
-          initialValues={{ status: "new" }}
           onFinish={handleSubmit}
           autoComplete="off"
           labelCol={{ flex: "110px" }}

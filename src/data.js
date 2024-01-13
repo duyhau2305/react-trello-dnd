@@ -16,17 +16,20 @@ export const data = {
     "card1": {
       id: "card1",
       title: "Card 1",
-      description: "This is card 1"
+      description: "This is card 1",
+      status: 'new'
     },
     "card2": {
       id: "card2",
       title: "Card 2",
-      description: "This is card 2"
+      description: "This is card 2",
+      status: 'new'
     },
     "card3": {
       id: "card3",
       title: "Card 3",
-      description: "This is card 3"
+      description: "This is card 3",
+      status: 'new'
     }
   }
 }
