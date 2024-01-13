@@ -5,7 +5,7 @@ import { Draggable } from "react-beautiful-dnd";
 
 const { Meta } = Card;
 
-function SimpleCard({ card, index, listId, onRemoveCard }) {
+function SimpleCard({ card, index, listId, onRemoveCard, }) {
   const handleRemoveCard = () => {
     onRemoveCard(listId, card.id);
   };

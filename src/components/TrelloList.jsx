@@ -4,7 +4,15 @@ import { Card, Tooltip, Button, Popconfirm } from "antd";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import SimpleCard from "./SimpleCard";
 
-function TrelloList({ title, listId, index, cards, setOpen, onDeleteList, onRemoveCard }) {
+function TrelloList({ title, listId, index, cards, setOpen, onDeleteList, onRemoveCard,handleAddCard }) {
+  const onAddCard = () => {
+    handleAddCard(listId,cards.id)
+    setOpen(true)
+  };
+
+  
+
+
   return (
     <Draggable draggableId={String(listId)} index={index}>
       {(provided) => (
@@ -26,6 +34,7 @@ function TrelloList({ title, listId, index, cards, setOpen, onDeleteList, onRemo
                         shape="circle"
                         icon={<PlusOutlined />}
                         onClick={() => setOpen(true)}
+                        onConfirm={onAddCard }
                       />
                     </Tooltip>
     
@@ -58,6 +67,7 @@ function TrelloList({ title, listId, index, cards, setOpen, onDeleteList, onRemo
                       card={card}
                       listId={listId}
                       onRemoveCard={onRemoveCard}
+                      
                     />
                   ))}
                   {provided.placeholder}

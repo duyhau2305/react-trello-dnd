@@ -36,11 +36,13 @@ function App() {
   const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [todos, setTodos] = useState(data);
+  const [currentListId, setCurrentListId] = useState(null);
 
   const handleSubmit = (values) => {
     console.log("values: ", values);
-
+    handleAddCard(currentListId, values);
     setConfirmLoading(true);
+    setOpen(false);
   };
 
   const handleCancel = () => {
@@ -60,6 +62,7 @@ function App() {
     // lists
     if(type === 'LIST') {
       const cloneLists = [...todos.columns];
+      console.log (" ", cloneLists)
       const columnSpliced = cloneLists.splice(source.index, 1)[0];
       cloneLists.splice(destination.index, 0, columnSpliced);
       setTodos(prevState => {
@@ -159,29 +162,52 @@ function App() {
   };
   console.log('todos: ', todos)
   const onRemoveCard = (listId, cardId) => {
-    console.log('onRemoveCard: ', { listId, cardId })
-    // setTodos(prevState => {
-    //   // Cập nhật danh sách card trong list tương ứng
-    //   const updatedCardsList = prevState.lists[listId].cards.filter(id => id !== cardId);
+   
+    setTodos(prevState => {
+      const list = prevState.lists[listId];
+      const filteredCards = list.cards.filter(id => id !== cardId);
   
-    //   // Cập nhật danh sách tổng thể của cards, nếu cần
-    //   const updatedCards = { ...prevState.cards };
-    //   delete updatedCards[cardId];
-  
-    //   return {
-    //     ...prevState,
-    //     lists: {
-    //       ...prevState.lists,
-    //       [listId]: {
-    //         ...prevState.lists[listId],
-    //         cards: updatedCardsList
-    //       }
-    //     },
-    //     cards: updatedCards
-    //   };
-    // });
+      return {
+        ...prevState,
+        lists: {
+          ...prevState.lists,
+          [listId]: {
+            ...list,
+            cards: filteredCards
+          }
+        }
+      };
+    });
   };
-
+  const handleAddCard = (listId, cardDetails) => {
+    setTodos(prevState => {
+      // Create a new card object with a unique ID and details passed from cardDetails
+      const newCard = {
+        id: `card-${Date.now()}`,
+        ...cardDetails
+      };
+  
+      // Get the current list and add the new card ID to it
+      const updatedList = {
+        ...prevState.lists[listId],
+        cards: [...prevState.lists[listId].cards, newCard.id]
+      };
+  
+      // Update the state with the new list and card
+      return {
+        ...prevState,
+        lists: {
+          ...prevState.lists,
+          [listId]: updatedList
+        },
+        cards: {
+          ...prevState.cards,
+          [newCard.id]: newCard // Assuming you maintain a separate cards collection
+        }
+      };
+    });
+  };
+  
 
   return (
     <>
@@ -222,6 +248,7 @@ function App() {
                       setOpen={setOpen}
                       onDeleteList={onDeleteList}
                       onRemoveCard={onRemoveCard}
+                      handleAddCard={handleAddCard}
                      
                     />
                   )
